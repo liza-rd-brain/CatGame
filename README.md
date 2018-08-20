@@ -1,2 +1,2 @@
-# -CatGame
+# CatGame
 Игра с котиком
