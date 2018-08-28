@@ -1,21 +1,28 @@
-
-  .cat{
-    position: absolute;
-    width: 120px;
-    height: 50px;
-    top: 230px;
-    left: 200px;
-    background: #DB8A74;
-    border: solid  #478978;
-    border-radius: 80%;
-    border-top-left-radius: 150px;
-    border-top-right-radius: 150px;
-    border-bottom-left-radius: 150px;
-    border-bottom-right-radius: 150px;
+#container{
+  border: solid 1px black;
+  width: 1200px;
+  height: 600px;
+  /*поместить игру в центр экрана*/
+  top: 300px;
+  left: 100px;
+}
+.cat{
+  position: absolute;
+  width: 120px;
+  height: 50px;
+  top: 230px;
+  left: 200px;
+  background: #DB8A74;
+  border: solid  #478978;
+  border-radius: 80%;
+  border-top-left-radius: 150px;
+  border-top-right-radius: 150px;
+  border-bottom-left-radius: 150px;
+  border-bottom-right-radius: 150px;
   }
 
   .jumpUp{
-    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 400ms /* linear  */cubic-bezier(0.175, 0.885, 0.32, 1.5);
   }
 
   .jumpDown{

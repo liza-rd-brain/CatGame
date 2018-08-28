@@ -9,12 +9,13 @@ function CatGame(container) {
     this.bottomCoord = "383px"
     this.jumpUp = this.jumpUp.bind(this)
     this.jumpDown = this.jumpDown.bind(this)
+    this.takeTheLevel = this.takeTheLevel.bind(this)
 }
 
 let cgprt = CatGame.prototype
 cgprt.CLASS_NAME = "catGame"
 
-cgprt.stepY = 100
+cgprt.stepY = 50
 
 cgprt.render = function () {
     this.catGameEl = document.createElement("div")
@@ -34,31 +35,50 @@ cgprt.render = function () {
 cgprt.jumpUp = function () {
     // продумать другой способ перебора swith -case?!
 
-    // если котик уже на верхнем уровне
-    //то он прыгает вверх и падает вниз
-    if (this.curentLevel == -1) {
+
+    if (this.curentLevel !== -4) {
         this.curentLevel -= 1
         this.catEl.classList.add("jumpUp")
-        this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
-        setTimeout(this.jumpDown, 200)
+        this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`;
+        setTimeout(this.takeTheLevel, 400);
+
     }
 
-    else {
-        this.curentLevel -= 1
-        this.catEl.classList.remove("jumpDown")
-        this.catEl.classList.add("jumpUp")
-        this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+
+}
+
+
+
+cgprt.takeTheLevel = function () {
+    if (this.curentLevel !== -2 && this.curentLevel !== 0) {
+
+    //подумать, как очистить таймер
+        var timeoutId = setTimeout(this.jumpDown, 200);
+
     }
 }
 
-cgprt.jumpDown = function () {
-    // если котик и так уже на нижнем уровне
-    // ниже он уже не прыгнет
-    if (this.curentLevel !== 1) {
+cgprt.jumpDown = function (timeoutId) {
+
+    if (this.curentLevel !== -4 && this.curentLevel !== -2 && this.curentLevel !== 0) {
         this.curentLevel += 1
         this.catEl.classList.add("jumpDown")
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
     }
+    else {
+        this.curentLevel += 2
+        this.catEl.classList.add("jumpDown")
+        this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+    }
+
+    
+    // если котик и так уже на нижнем уровне
+    // ниже он уже не прыгнет
+    /*  while (this.curentLevel !== 2) {
+             this.curentLevel += 1
+             this.catEl.classList.add("jumpDown")
+             this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+         } */
 }
 
 cgprt = null

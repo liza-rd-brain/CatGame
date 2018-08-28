@@ -1,6 +1,7 @@
 function Navigator(jumpUp, jumpDown) {
     this.jumpUp = jumpUp
     this.jumpDown = jumpDown
+    
 }
 
 let nprt = Navigator.prototype
