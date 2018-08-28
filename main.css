@@ -1,9 +1,9 @@
 
   .cat{
     position: absolute;
-    width: 150px;
-    height: 80px;
-    top: 200px;
+    width: 120px;
+    height: 50px;
+    top: 230px;
     left: 200px;
     background: #DB8A74;
     border: solid  #478978;
@@ -12,31 +12,22 @@
     border-top-right-radius: 150px;
     border-bottom-left-radius: 150px;
     border-bottom-right-radius: 150px;
-    /*хорошо подходит для прыжка вверх, но не вниз*/
-    /* transition: top 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); */
-  /*  transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);  */
-  
-    
-   }
+  }
 
+  .jumpUp{
+    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .jumpDown{
+    transition: transform 600ms cubic-bezier(0.18,0.08,0.66,0.46);
+  }
 
   .line{
-     position: absolute;
-     height:3px;
-     width: 1000px;
-     /* top:180px; */
-    
+    position: absolute;
+    height:3px;
+    width: 1000px;
     background:gray;
     }
-
-   
-
-  
-   /*пока кошачье тело просто ходит вверх-вниз*/
-/* @keyframes jump{
-  60% {top:40px;}
-
-} */
 
 
 

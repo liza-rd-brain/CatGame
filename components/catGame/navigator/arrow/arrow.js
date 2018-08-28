@@ -1,5 +1,4 @@
-function Arrow(changeCoord,direction) {
-    this.changeCoord = changeCoord
+function Arrow(direction) {
     this.direction = direction
 }
 
@@ -11,9 +10,7 @@ aprt.render = function () {
     let ArrowEl = document.createElement("button")
     ArrowEl.type = "button"
     ArrowEl.innerHTML = this.direction
-    ArrowEl.data = this.direction
-    ArrowEl.addEventListener("click", this.changeCoord)
-
+    
     return ArrowEl
 }
 
