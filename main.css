@@ -21,6 +21,18 @@
   border-bottom-right-radius: 150px;
   }
 
+
+ .barrier{
+  position: relative;
+  width: 50px;
+  height: 50px;
+  top: 205px;
+  left: 400px;
+  background: #167543;
+  /* transform: translateX(200px) ; */
+  transition: transform 5s linear;
+
+ }
   .jumpUp{
     transition: transform 400ms /* linear  */cubic-bezier(0.175, 0.885, 0.32, 1.5);
   }

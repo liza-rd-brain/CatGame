@@ -12,7 +12,7 @@ nprt.DOWN = "down"
 
 nprt.render = function () {
     let navigatorEl = document.createElement("div")
-    navigatorEl.className = this.className
+    navigatorEl.className = this.CLASS_NAME
 
     let arrowUpEl = new Arrow(this.UP).render()
     navigatorEl.appendChild(arrowUpEl)
