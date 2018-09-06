@@ -13,7 +13,7 @@ function CatGame(container) {
     this.jumpDown = this.jumpDown.bind(this)
     this.takeTheLevel = this.takeTheLevel.bind(this)
     this.moveBarrier = this.moveBarrier.bind(this)
-    
+
 }
 
 let cgprt = CatGame.prototype
@@ -38,10 +38,13 @@ cgprt.render = function () {
     this.barrierEl = new Barrier().render()
     this.catGameEl.appendChild(this.barrierEl)
 
-    setTimeout(this.moveBarrier, 1000)
-    
 
-}
+    //задаю таймер для движения барьера
+    // без таймера еще ничего не построиться и работать не будет
+   /*  setTimeout(this.moveBarrier, 1000) */
+
+/*     this.moveBarrier()
+ */}
 
 cgprt.jumpUp = function () {
     if (this.curentLevel !== -4) {
@@ -50,7 +53,7 @@ cgprt.jumpUp = function () {
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`;
         setTimeout(this.takeTheLevel, 600);
 
-        
+
     }
 }
 
@@ -75,8 +78,25 @@ cgprt.jumpDown = function () {
     }
 }
 
-cgprt.moveBarrier = function(){
-    this.barrierEl.style.transform ="translateX(-500px)"
+
+
+cgprt.checkCollision = function () {
+
+
+}
+
+
+
+
+
+//двигающий барьер метод
+// есть смысл убрать его в сам элемент барьер?!
+
+cgprt.moveBarrier = function () {
+
+    this.barrierEl.style.transform = "translateX(800px)"
+
+
 }
 
 cgprt = null

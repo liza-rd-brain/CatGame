@@ -1,10 +1,18 @@
+/* body {
+  margin: 0;
+  background: white; 
+}
+ */
+
 #container{
   border: solid 1px black;
-  width: 1200px;
+  width: 600px;
   height: 600px;
   /*поместить игру в центр экрана*/
   top: 300px;
   left: 100px;
+  /*выходящее за рамки контейнера прячется*/
+   overflow: hidden; 
 }
 .cat{
   position: absolute;
@@ -24,15 +32,24 @@
 
  .barrier{
   position: relative;
-  width: 50px;
-  height: 50px;
-  top: 205px;
-  left: 400px;
+  width: 8px;
+  height: 30px;
+  top: 225px;
+  left: 700px;
   background: #167543;
   /* transform: translateX(200px) ; */
-  transition: transform 5s linear;
-
+  /*анимация через трансформацию*/
+ /*  transition: transform 3s linear; */
+ /* 3 секунды задержка + мы двигаем с 1000px для органичности появления препятствия*/
+ animation: barrierMove 4s 3s linear infinite;
  }
+  
+  @keyframes barrierMove {
+    from {left: 1000px}
+    to {left: 0px}
+  }
+
+ 
   .jumpUp{
     transition: transform 400ms /* linear  */cubic-bezier(0.175, 0.885, 0.32, 1.5);
   }
@@ -44,7 +61,7 @@
   .line{
     position: absolute;
     height:3px;
-    width: 1000px;
+    width: 600px;
     background:gray;
     }
 
