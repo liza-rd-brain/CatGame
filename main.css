@@ -29,23 +29,23 @@
   border-bottom-right-radius: 150px;
   }
 
-
+/*сделать релативное,чтобы изображние не вылазило за границу*/
  .barrier{
-  position: relative;
+  position: absolute;
   width: 8px;
   height: 30px;
-  top: 225px;
+  top: 255px;
   left: 700px;
   background: #167543;
   /* transform: translateX(200px) ; */
   /*анимация через трансформацию*/
  /*  transition: transform 3s linear; */
  /* 3 секунды задержка + мы двигаем с 1000px для органичности появления препятствия*/
- animation: barrierMove 4s 3s linear infinite;
+ animation: barrierMove 4s /* 3s */ linear infinite;
  }
   
   @keyframes barrierMove {
-    from {left: 1000px}
+    from {left: 750px}
     to {left: 0px}
   }
 

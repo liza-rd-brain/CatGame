@@ -20,6 +20,12 @@ lsprt.render = function () {
     let bottomLineEl = new Line(this.bottomCoord).render()
     layersEl.appendChild(bottomLineEl)
 
+
+
+    //проверочная линия
+    let extraLineEl = new Line("205px").render()
+    layersEl.appendChild(extraLineEl)
+
     return layersEl
 }
 

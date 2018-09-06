@@ -12,7 +12,14 @@ function CatGame(container) {
     this.jumpUp = this.jumpUp.bind(this)
     this.jumpDown = this.jumpDown.bind(this)
     this.takeTheLevel = this.takeTheLevel.bind(this)
-    this.moveBarrier = this.moveBarrier.bind(this)
+    /* this.moveBarrier = this.moveBarrier.bind(this) */
+    this.checkCollision = this.checkCollision.bind(this)
+    this.catLeft = "200px"
+    this.catWidth = "120px"
+    this.barrierWidth = "8px"
+    this.catHight = "50px"
+    this.barrierHight = "30px"
+
 
 }
 
@@ -38,10 +45,15 @@ cgprt.render = function () {
     this.barrierEl = new Barrier().render()
     this.catGameEl.appendChild(this.barrierEl)
 
-
     //задаю таймер для движения барьера
     // без таймера еще ничего не построиться и работать не будет
-   /*  setTimeout(this.moveBarrier, 1000) */
+    /*  setTimeout(this.moveBarrier, 1000) */
+
+    // таймер для проверки коллизии
+
+
+    setInterval(this.checkCollision, 500)
+
 
 /*     this.moveBarrier()
  */}
@@ -52,8 +64,6 @@ cgprt.jumpUp = function () {
         this.catEl.classList.add("jumpUp")
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`;
         setTimeout(this.takeTheLevel, 600);
-
-
     }
 }
 
@@ -82,6 +92,51 @@ cgprt.jumpDown = function () {
 
 cgprt.checkCollision = function () {
 
+    var XColl = false;
+    var YColl = false;
+
+
+
+
+
+    /* let barrierLeft = getComputedStyle(this.barrierEl).left */
+    //столкновение по x работает!!! 
+    // привязываюсь к стационарным координатам котика
+    /*  if (getComputedStyle(this.barrierEl).left <= "300px" && getComputedStyle(this.barrierEl).left >= "220px") {
+         XColl = true
+         console.log("trueX")
+     } */
+
+    //проба коллизии по y через координаты
+    /* let catTop = getComputedStyle(this.catEl).top
+    if (catTop <= "225px") {
+        YColl = true
+        console.log("trueY")
+    }
+    else { console.log("_______") } */
+
+
+    // в столкновении по  y попробую привязаться к промежуточным уровням
+    //вообще, все лучше привести к одному знаменателю: либо уровни, либо координаты
+    // пробую, когда барьер находится в середине x координаты котика, котик должен занять -1 уровень
+    // иначе коллизия
+
+    let barrierLeft = getComputedStyle(this.barrierEl).left
+    if (barrierLeft <= "290px" && barrierLeft >= "260px" && this.curentLevel == -1) {
+        console.log("No collision")
+    }
+    /* else{console.log(barrierLeft)}
+ */
+
+    /*    if (XColl&& YColl){
+          console.log("collision")
+      }  */
+
+
+
+
+
+
 
 }
 
@@ -92,11 +147,11 @@ cgprt.checkCollision = function () {
 //двигающий барьер метод
 // есть смысл убрать его в сам элемент барьер?!
 
-cgprt.moveBarrier = function () {
+/* cgprt.moveBarrier = function () {
 
     this.barrierEl.style.transform = "translateX(800px)"
 
 
-}
+} */
 
 cgprt = null
