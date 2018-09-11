@@ -5,21 +5,23 @@
  */
 
 #container{
+  position:relative;
   border: solid 1px black;
   width: 600px;
   height: 600px;
   /*поместить игру в центр экрана*/
-  top: 300px;
-  left: 100px;
+   top: 30px; 
+  left: 300px;
   /*выходящее за рамки контейнера прячется*/
    overflow: hidden; 
 }
 .cat{
-  position: absolute;
+   position: absolute; 
   width: 120px;
   height: 50px;
-  top: 230px;
-  left: 200px;
+  top: 228px;
+  /*котик посередине*/
+  left: 240px;
   background: #DB8A74;
   border: solid  #478978;
   border-radius: 80%;
@@ -41,14 +43,28 @@
   /*анимация через трансформацию*/
  /*  transition: transform 3s linear; */
  /* 3 секунды задержка + мы двигаем с 1000px для органичности появления препятствия*/
- animation: barrierMove 4s /* 3s */ linear infinite;
+ animation: barrierMove 5s 3s linear infinite;
  }
   
   @keyframes barrierMove {
-    from {left: 750px}
+    from {left: 600px}
     to {left: 0px}
   }
 
+.navigator{
+  position: absolute; 
+  top:500;
+  left:200;
+
+
+}
+
+ .arrow{
+
+
+  width: 100;
+  height: 70;
+} 
  
   .jumpUp{
     transition: transform 400ms /* linear  */cubic-bezier(0.175, 0.885, 0.32, 1.5);
@@ -63,9 +79,30 @@
     height:3px;
     width: 600px;
     background:gray;
-    }
+  }
 
 
+
+  #grass{
+    position: relative;
+    top: 370px;
+    height: 230px;
+ 
+
+    background-color: rgb(70, 184, 21);
+  }
+
+
+  #sky{
+    position: relative;
+    bottom: 230px;
+    height: 250px;
+  
+
+    background-color:rgb(60, 78, 194);
+  }
+
+  
 
 
   

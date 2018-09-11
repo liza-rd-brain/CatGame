@@ -12,6 +12,7 @@ function CatGame(container) {
     this.jumpUp = this.jumpUp.bind(this)
     this.jumpDown = this.jumpDown.bind(this)
     this.takeTheLevel = this.takeTheLevel.bind(this)
+    this.smash = this.smash.bind(this)
     /* this.moveBarrier = this.moveBarrier.bind(this) */
     this.checkCollision = this.checkCollision.bind(this)
     this.catLeft = "200px"
@@ -52,7 +53,7 @@ cgprt.render = function () {
     // таймер для проверки коллизии
 
 
-    setInterval(this.checkCollision, 500)
+    setInterval(this.checkCollision, 5000)
 
 
 /*     this.moveBarrier()
@@ -89,69 +90,56 @@ cgprt.jumpDown = function () {
 }
 
 
-
+// проверяет столкновение с котом на период прохождения препятствия под котиком
+// приходится играть со временем, чтобы добиться оптимального эффекта
+// нужно ли потом очистить таймер setTimeout
 cgprt.checkCollision = function () {
-
-    var XColl = false;
-    var YColl = false;
-
-
-
-
-
-    /* let barrierLeft = getComputedStyle(this.barrierEl).left */
-    //столкновение по x работает!!! 
-    // привязываюсь к стационарным координатам котика
-    /*  if (getComputedStyle(this.barrierEl).left <= "300px" && getComputedStyle(this.barrierEl).left >= "220px") {
-         XColl = true
-         console.log("trueX")
-     } */
-
-    //проба коллизии по y через координаты
-    /* let catTop = getComputedStyle(this.catEl).top
-    if (catTop <= "225px") {
-        YColl = true
-        console.log("trueY")
+    //может быть id таймер вынести в конструктор
+    //после столкновения нам его тоже можно сразу очистить?!
+    var checkCollisionTimerID = setInterval(this.smash, 100)
+    setTimeout(stopCollisionTimerID, 700)
+    function stopCollisionTimerID() {
+        clearInterval(checkCollisionTimerID), 1000
     }
-    else { console.log("_______") } */
 
-
-    // в столкновении по  y попробую привязаться к промежуточным уровням
-    //вообще, все лучше привести к одному знаменателю: либо уровни, либо координаты
-    // пробую, когда барьер находится в середине x координаты котика, котик должен занять -1 уровень
-    // иначе коллизия
-
-    let barrierLeft = getComputedStyle(this.barrierEl).left
-    if (barrierLeft <= "290px" && barrierLeft >= "260px" && this.curentLevel == -1) {
-        console.log("No collision")
-    }
-    /* else{console.log(barrierLeft)}
- */
-
-    /*    if (XColl&& YColl){
-          console.log("collision")
-      }  */
-
-
-
-
-
+    /*  setTimeout (clearInterval(checkCollisionTimerID), 1000) */
 
 
 }
 
+cgprt.smash = function () {
+
+    if (this.curentLevel != -1) {
+        console.log('бум')
+    }
+}
 
 
 
+// кот носом врезался в препятствие
+/* cgprt.checkCollision = function () {
 
-//двигающий барьер метод
-// есть смысл убрать его в сам элемент барьер?!
-
-/* cgprt.moveBarrier = function () {
-
-    this.barrierEl.style.transform = "translateX(800px)"
-
-
+    if (this.curentLevel != -1) {
+        console.log('бум')
+    }
 } */
+
+
+/*  let barrierLeft = getComputedStyle(this.barrierEl).left
+ if (barrierLeft <= "290px" && barrierLeft >= "260px" && this.curentLevel == -1) {
+     console.log("No collision")
+ } */
+
+
+
+
+
+
+
+
+
+
+
+
 
 cgprt = null
