@@ -11,7 +11,7 @@
   height: 600px;
   /*поместить игру в центр экрана*/
    top: 30px; 
-  left: 300px;
+  left: 0px;
   /*выходящее за рамки контейнера прячется*/
    overflow: hidden; 
 }
@@ -37,14 +37,21 @@
   width: 8px;
   height: 30px;
   top: 255px;
-  left: 700px;
+  left: 600px;
   background: #167543;
+  
   /* transform: translateX(200px) ; */
   /*анимация через трансформацию*/
  /*  transition: transform 3s linear; */
  /* 3 секунды задержка + мы двигаем с 1000px для органичности появления препятствия*/
- animation: barrierMove 5s 3s linear infinite;
+ /* animation: barrierMove 5s 3s linear infinite; */
  }
+
+ .barrierMove{
+  transition: transform 4000ms linear;
+ }
+
+
   
   @keyframes barrierMove {
     from {left: 600px}
@@ -81,26 +88,47 @@
     background:gray;
   }
 
+  .healthLevel{
+
+  
+  padding: 5px;
+ /*  display:flex;
+  flex-direction: row; */
+  display: grid;
+   grid-template-columns: repeat(3, 25px); 
+  /* border: dashed 1px greenyellow; */
+  }
+
+  .healthPoint{
+    width: 20px;
+    height: 20px;
+    background: rgb(203, 53, 103);
+    border-radius: 50%;
+    /* justify-content: center;
+    align-items: center; */
+    
+  }
 
 
-  #grass{
+
+/*   #grass{
     position: relative;
     top: 370px;
     height: 230px;
  
 
     background-color: rgb(70, 184, 21);
-  }
+  } */
 
 
-  #sky{
+/*   #sky{
     position: relative;
     bottom: 230px;
     height: 250px;
   
 
     background-color:rgb(60, 78, 194);
-  }
+  } */
 
   
 

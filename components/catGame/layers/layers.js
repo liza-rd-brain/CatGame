@@ -22,10 +22,6 @@ lsprt.render = function () {
 
 
 
-    //проверочная линия
-    let extraLineEl = new Line("205px").render()
-    layersEl.appendChild(extraLineEl)
-
     return layersEl
 }
 
