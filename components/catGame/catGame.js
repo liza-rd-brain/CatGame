@@ -71,7 +71,7 @@ cgprt.render = function () {
 } */
 
 cgprt.goGame = function () {
-    this.barrierEl = new Barrier().render()
+    this.barrierEl = new Barrier(this.topCoord, this.middleCoord, this.bottomCoord).render()
     this.catGameEl.appendChild(this.barrierEl)
     if (this.levelCount > 0) {
         setTimeout(this.barrierMove, 500)

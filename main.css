@@ -36,16 +36,30 @@
   position: absolute;
   width: 8px;
   height: 30px;
-  top: 255px;
+ 
   left: 600px;
   background: #167543;
+ }
+
+  .barrierOne{
+    top:155px;
+  }
+  
+  .barrierTwo{
+    top:255px;
+  }
+
+  .barrierThree{
+    top:355px;
+  }
+
   
   /* transform: translateX(200px) ; */
   /*анимация через трансформацию*/
  /*  transition: transform 3s linear; */
  /* 3 секунды задержка + мы двигаем с 1000px для органичности появления препятствия*/
  /* animation: barrierMove 5s 3s linear infinite; */
- }
+ 
 
  .barrierMove{
   transition: transform 4000ms linear;
