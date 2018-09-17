@@ -36,6 +36,7 @@
   position: absolute;
   width: 8px;
   height: 30px;
+  /* top:255px; */
  
   left: 600px;
   background: #167543;
@@ -64,6 +65,9 @@
  .barrierMove{
   transition: transform 4000ms linear;
  }
+
+
+ 
 
 
   
