@@ -5,8 +5,8 @@
  */
 
 #container{
-  position:relative;
-  border: solid 1px black;
+    /* position:relative; */  
+  border: solid 1px rgb(255, 101, 101);
   width: 600px;
   height: 600px;
   /*поместить игру в центр экрана*/
@@ -17,42 +17,55 @@
 }
 .cat{
    position: absolute; 
-  width: 120px;
-  height: 50px;
-  top: 228px;
+  width: 146px;
+  height: 80px;
+  top: 235px;
   /*котик посередине*/
   left: 240px;
-  background: #DB8A74;
+  background: url("components/catGame/cat/cat_run.gif") no-repeat;
+  background-size: 91px 50px;
+ 
+  /*примитивный рисунок котика*/
+  /* background: #DB8A74;
   border: solid  #478978;
   border-radius: 80%;
   border-top-left-radius: 150px;
   border-top-right-radius: 150px;
   border-bottom-left-radius: 150px;
-  border-bottom-right-radius: 150px;
+  border-bottom-right-radius: 150px; */
   }
 
 /*сделать релативное,чтобы изображние не вылазило за границу*/
  .barrier{
   position: absolute;
-  width: 8px;
-  height: 30px;
+  width:8px;
+  height: 50px;
   /* top:255px; */
- 
-  left: 600px;
-  background: #167543;
+ left: 600px;
+  /* background: url("components/catGame/barrier/барьер.png")  no-repeat; */
+   background:brown ; 
  }
 
-  .barrierOne{
-    top:155px;
-  }
-  
-  .barrierTwo{
-    top:255px;
-  }
 
-  .barrierThree{
-    top:355px;
-  }
+ .barrierLevelTwo{
+  top:335px;
+}
+.barrierLevelOne{
+  top:285px;
+}
+.barrierLevelZero{
+  top:235px;
+}
+.barrierLevelMinusOne{
+  top:185px;
+}
+.barrierLevelMinusTwo{
+  top:135px;
+}
+.barrierLevelMinusThree{
+  top:85px;
+}
+
 
   
   /* transform: translateX(200px) ; */
@@ -63,7 +76,9 @@
  
 
  .barrierMove{
-  transition: transform 4000ms linear;
+   transition: transform    linear; 
+
+  
  }
 
 
@@ -85,18 +100,25 @@
 }
 
  .arrow{
-
-
   width: 100;
   height: 70;
 } 
+
+@keyframes spring{
+  0% {transform:translateY(0)};
+  50% {transform:translateY(100px)};
+  100% {transform:translateY(0);}
+
+}
  
-  .jumpUp{
-    transition: transform 400ms /* linear  */cubic-bezier(0.175, 0.885, 0.32, 1.5);
-  }
+  /* .jumpUp{
+    
+    transition: transform linear;   
+  
+  } */
 
   .jumpDown{
-    transition: transform 600ms cubic-bezier(0.18,0.08,0.66,0.46);
+    transition: transform /* 600ms */ cubic-bezier(0.18,0.08,0.66,0.46);
   }
 
   .line{
@@ -106,50 +128,202 @@
     background:gray;
   }
 
-  .healthLevel{
+ 
 
-  
-  padding: 5px;
- /*  display:flex;
-  flex-direction: row; */
-  display: grid;
-   grid-template-columns: repeat(3, 25px); 
-  /* border: dashed 1px greenyellow; */
-  }
-
-  .healthPoint{
-    width: 20px;
-    height: 20px;
-    background: rgb(203, 53, 103);
-    border-radius: 50%;
-    /* justify-content: center;
-    align-items: center; */
-    
-  }
+ 
 
 
 
-/*   #grass{
+ .grass{
     position: relative;
     top: 370px;
     height: 230px;
  
 
     background-color: rgb(70, 184, 21);
-  } */
+  } 
 
 
-/*   #sky{
+  .sky{
     position: relative;
     bottom: 230px;
-    height: 250px;
+    height: 285px;
+ 
+
+    background-color:rgb(160, 201, 218);
+  }  
+
+  @keyframes cityMove {
+   /*  from{left:0%;}
+    to{ left:-30%;} */
+    
+
+    /* from{left:0px;opacity:1}  /*перемещаем блок с облаками за правый край голубого блока, постепенно делая блок прозрачным*/
+    /*запрозрачнивание облаков*/
+    /* 51% {opacity: 0;} */  /*чтобы когда он начал перемещаться за левый край голубого блока, его не было видно*/
+   /*  10% { left: -80px;opacity:1} 
+    15%{left: -100px;opacity:0} 
+    50%{left: 830px;opacity:0}
+    70%{left:600px;opacity:1 }
+    100%{left:0px} */ 
+
+    from{left:0%;opacity:1}  /*перемещаем блок с облаками за правый край голубого блока, постепенно делая блок прозрачным*/
+    /*запрозрачнивание облаков*/
+    /* 51% {opacity: 0;} */  /*чтобы когда он начал перемещаться за левый край голубого блока, его не было видно*/
+    10% { left: -10%;opacity:1} 
+
+    
+    /* 15%{left: -15%;opacity:0} 
+    50%{left: 100%;opacity:0}
+    70%{left:75%;opacity:1 } */
+    100%{left:0%}
+  }
+
+.city{
   
+  width:830px;
+  height:500px;
+  position: absolute;
+  top: -50px;
+  left: 0px; 
+  background: url("city0.png")  no-repeat;
+  background-size: 800px; 
+  animation: city 10s linear infinite;
+ 
+}
 
-    background-color:rgb(60, 78, 194);
-  } */
-
+@keyframes city {
+  from { background-position: -1000px 100%, 0 0;}
+  to { background-position: 0 100%; }
   
+}
+  .houseOne {
+   position: absolute;
+   width: 80px;
+   height: 60px;
+   background:red;
+   
+    top: 40px;/*положение башни*/
+    left: 0px;
+   /*  animation: sityMove 10s linear infinite; */
+  }
 
-
+  .houseTwo {
   
+     width: 0;
+    height: 0;
+    border-left: 80px solid transparent;
+    border-right: 80px solid transparent;
+    border-bottom: 50px solid rgb(115, 130, 223);
+    position: absolute;
+    top: 50px;
+    left: 60px;
+    /* animation: sityMove 10s linear infinite ; */
+     
+  }
+
+  .houseThree {
+    position: absolute;
+    width: 280px;
+    height: 40px;
+    background:rgb(115, 130, 223);
+    
+     top: 60px;/*положение башни*/
+     left: 200px;
+     
+
+     /* animation: sityMove 10s linear infinite 20s; */
+   }
+   .houseThree:before {
+    content: "";
+    position: absolute;
+    width: 35px;
+    background:rgb(115, 130, 223);
+    height: 65px;
+    /* background: red; */
+    left: 40px;
+    bottom:0px;
+  }
+  .houseThree:after {
+    content: "";
+    position: absolute;
+    width: 35px;
+    background:rgb(115, 130, 223);
+    height: 65px;
+    /* background: red; */
+    left: 200px;
+    bottom:0px;
+  }
+
+ .houseFour {
+  
+   width: 0;
+   height: 0;
+   border-left: 90px solid transparent;
+   border-right: 90px solid transparent;
+   border-bottom: 60px solid rgb(115, 130, 223);
+   position: absolute;
+   top: 40px;
+   left: 450px;
+    
+ }
+
+ .houseFive {
+  
+  position: absolute;
+  width: 80px;
+  height: 100px;
+  background:rgb(115, 130, 223);
+  top: 0px;
+  left: 600px;
+  
+}
+
+
+.houseSix {
+   width: 0;
+   height: 0;
+   border-left: 90px solid transparent;
+   border-right: 90px solid transparent;
+   border-bottom: 60px solid rgb(115, 130, 223);
+   position: absolute;
+   top: 40px;
+   left: 650px;
+  
+}
+.houseSix:after {
+  content: "";
+   position: absolute;
+   width: 20px;
+   height: 60px;
+   background:rgb(115, 130, 223);
+   top: 0px;
+  left: 70px;
+ 
+}
+ 
+  .healthLevel{
+
+    position: absolute;
+    top: 5px;
+    padding: 5px;
+   /*  display:flex;
+    flex-direction: row; */
+    display: grid;
+     grid-template-columns: repeat(3, 35px); 
+    /* border: dashed 1px greenyellow; */
+    }
+
+
+    .healthPoint{
+    
+       width: 40px;
+      height: 40px; 
+      background: url("components/catGame/healthLevel/healthPoint/heart-coloring-pages-1-150x150.png")  no-repeat;
+      /* background: rgb(203, 53, 103); */
+     /*  border-radius: 50%; */
+      /* justify-content: center;
+      align-items: center; */
+      
+    }
   

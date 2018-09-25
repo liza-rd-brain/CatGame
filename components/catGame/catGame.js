@@ -8,6 +8,7 @@ function CatGame(container) {
     this.timerCollision = null
 
     this.curentLevel = 0
+    this.lastJumpTime = 0
     // количество жизней
     this.levelCount = 3
     this.topCoord = "183px"
@@ -15,7 +16,8 @@ function CatGame(container) {
     this.bottomCoord = "383px"
     this.jumpUp = this.jumpUp.bind(this)
     this.jumpDown = this.jumpDown.bind(this)
-    this.takeTheLevel = this.takeTheLevel.bind(this)
+    /* this.jumpDownChangeCoord = this.jumpDownChangeCoord.bind(this) */
+    /* this.takeTheLevel = this.takeTheLevel.bind(this) */
     this.smash = this.smash.bind(this)
     this.deleteHealthPoint = this.deleteHealthPoint.bind(this)
     this.goGame = this.goGame.bind(this)
@@ -23,6 +25,12 @@ function CatGame(container) {
     this.barrierMove = this.barrierMove.bind(this)
     this.barrierDelete = this.barrierDelete.bind(this)
     this.barrierSelectLevel = this.barrierSelectLevel.bind(this)
+    this.update = this.update.bind(this)
+    this.fallAfterTheJumpUp = this.fallAfterTheJumpUp.bind(this)
+
+    // объект будет создан с уже вложенным requestAnimationFrame
+    // он будет постоянно проверять изменения перед отрисовкой кадра
+    requestAnimationFrame(this.update)
 
 
     this.catLeft = "200px"
@@ -37,7 +45,21 @@ function CatGame(container) {
 let cgprt = CatGame.prototype
 cgprt.CLASS_NAME = "catGame"
 
+// шаг для прыжка котика
 cgprt.stepY = 50
+// константы координат
+
+//временные константы
+cgprt._durationOfOneScreen = 4600
+cgprt._timeToRefreshScreen = 500
+cgprt._timeOfMovingTheBarrier = 4000
+cgprt._timeOfBeginningTheAreaOfCollision = 1800
+cgprt._intervalOfChekingTheCollision = 100
+cgprt._durationOfChekingTheCollision = 400
+cgprt._durationOfJumpUp = 200
+cgprt._durationOfJumpDown = 600
+
+
 
 cgprt.render = function () {
     this.catGameEl = document.createElement("div")
@@ -57,8 +79,6 @@ cgprt.render = function () {
     this.catGameEl.appendChild(this.healthLevelEl)
 
     this.goGame()
-
-
 }
 
 
@@ -66,42 +86,63 @@ cgprt.render = function () {
 cgprt.goGame = function () {
     // игра начинается= барьер двигается, только если у нас еще есть жизни
     if (this.levelCount > 0) {
-        //барьер будет с каждым экраном перерисовываться
-        this.barrierEl = new Barrier(this.topCoord, this.middleCoord, this.bottomCoord).render()
-        this.catGameEl.appendChild(this.barrierEl)
-
+        this.createBarrier()
         //выбираем рандомное расположение барьера
         this.barrierSelectLevel()
         //прибавляем 500 ms, чтобы успеть экрану обновиться
-        setTimeout(this.barrierMove, 500)
-    }
-    //зацикливаем вызов игры
-    //тоже потом очистим, когда красиво остановим игру
-    setTimeout(this.goGame, 4600)
+        setTimeout(this.barrierMove, this._timeToRefreshScreen)
 
+        //не понимаю, как здесь использовать requestAnimationFrame, так же таймер добавлять если только?!
+        // иначе у меня просто сразу будет смещаться барьер!!!
+        /* requestAnimationFrame(this.barrierMove) */
+
+
+
+        //зацикливаем вызов игры
+        setTimeout(this.goGame, this._durationOfOneScreen)
+    }
+    else {
+        alert("GAME OVER")
+    }
+
+}
+cgprt.createBarrier = function () {
+    //барьер будет с каждым экраном перерисовываться
+    this.barrierEl = new Barrier().render()
+    this.catGameEl.appendChild(this.barrierEl)
 }
 
 cgprt.barrierSelectLevel = function () {
-
+    /* let randomAmountBarrier = Math.floor(Math.random() * 4) */
     //решаем какой уровень займет барьер
+    let randomLevel = Math.floor(Math.random() * 6)
 
-    let randomLevel = Math.floor(Math.random() * 3)
     switch (randomLevel) {
         case 0:
-            this.barrierEl.classList.add("barrierOne")
-            // придумаем св-во типа линия движения, в него будем отдавать верхнюю, среднюю, нижнюю линию
-            // для большого количества препятствий, вероятно, проще будет заочно расчертить на невидимые промежутки-лиинии
-            this.barrierEl.lineOfMotion = -2
+            this.barrierEl.classList.add("barrierLevelTwo")
+            //т.к. экран все равно будет перерисовываться будем добавлять классы..
+            this.barrierEl.lineOfMotion = 2
             break
-
         case 1:
-            this.barrierEl.classList.add("barrierTwo")
+            this.barrierEl.classList.add("barrierLevelOne")
+            this.barrierEl.lineOfMotion = 1
+            break
+        case 2:
+            this.barrierEl.classList.add("barrierLevelZero")
             this.barrierEl.lineOfMotion = 0
             break
-
-        case 2:
-            this.barrierEl.classList.add("barrierThree")
-            this.barrierEl.lineOfMotion = 2
+        case 3:
+            this.barrierEl.classList.add("barrierLevelMinusOne")
+            this.barrierEl.lineOfMotion = -1
+            break
+        case 4:
+            this.barrierEl.classList.add("barrierLevelMinusTwo")
+            this.barrierEl.lineOfMotion = -2
+            break
+        case 5:
+            this.barrierEl.classList.add("barrierLevelMinusThree")
+            this.barrierEl.lineOfMotion = -3
+            break
     }
 
 
@@ -110,16 +151,19 @@ cgprt.barrierSelectLevel = function () {
 cgprt.barrierMove = function () {
     // добавляем класс с анимацией
     this.barrierEl.classList.add("barrierMove")
-    // говорим насколько сдвинуться барьеру
-    // это тоже как-то перенестив рандомный решатель
+    // сюда же вытащим время для движения барьера
+    this.barrierEl.style.transitionDuration = `${this._timeOfMovingTheBarrier}ms`
+    // это тоже как-то перенести в КОНСТАНТУ привязка к ширине экрана
     this.barrierEl.style.transform = `translateX(${-610}px)`
+
+
 
     // игра началась, запустили таймер на проверку столкновения через 1.5 секунды
     // он будет работать примерно одну секунду(может и поменьше)
-    setTimeout(this.smash, 1500)
+    setTimeout(this.smash, this._timeOfBeginningTheAreaOfCollision)
 
-    // по окончании одного экрана удаляем элемент
-    setTimeout(this.barrierDelete, 4000)
+    // по окончании одного экрана удаляем элемент = время движения барьера
+    setTimeout(this.barrierDelete, this._timeOfMovingTheBarrier)
 }
 
 cgprt.barrierDelete = function () {
@@ -134,22 +178,19 @@ cgprt.stopCheckCollison = function () {
 
 cgprt.smash = function () {
     // зацикливаем таймер проверки на столкновение
-    this.timerCollision = setTimeout(this.smash, 250)
+    this.timerCollision = setTimeout(this.smash, this._intervalOfChekingTheCollision)
 
 
 
     if (this.curentLevel == this.barrierEl.lineOfMotion) {
         console.log('бум')
         this.deleteHealthPoint()
-
         // если столкновение произошло,  очистим таймер ожидания столкновения сразу
         this.stopCheckCollison()
-        /* this.barrierEl.classList.add("barrierMoveDalay")
-        this.barrierEl.style.transform = `translateX(${-610}px)` */
-        // этот таймер нужно очистить
+
     }
     //если столкновение не произошло, то мы очистим таймер через 600ms
-    else (setTimeout(this.stopCheckCollison, 500))
+    else (setTimeout(this.stopCheckCollison, this._durationOfChekingTheCollision))
 
 
 }
@@ -162,55 +203,102 @@ cgprt.deleteHealthPoint = function () {
 
 }
 
+// попробую просто заново переписать прыжок вверх 
+
+/* cgprt.jumpUp = function () {
+    this.curentLevel -= 1
+    this.catEl.classList.add("jumpUp")
+    this.catEl.style.animationDuration = `${this._durationOfJumpUp}ms` 
+    /
+    requestAnimationFrame(this.takeTheLevel)
+
+} */
+
+
+// сделать отдельный метод смены координаты
+// и отдельный метод прыжок который уже будет принимать переменную
+
+
+cgprt.update = function () {
+    requestAnimationFrame(this.update)
+    // привязка к контексту с вызовом
+    this.fallAfterTheJumpUp()
+}
+
+
+
+//для каждой логики проверки вынести отдельный блок кода = отдельную функцию
+cgprt.fallAfterTheJumpUp = function () {
+    //если не занял уровень, то спрыгивает
+    if (this.curentLevel !== -2 && this.curentLevel !== 0 && this.curentLevel !== 2) {
+        //спрыгивает спустя 600 мс
+
+        if (this.lastJumpTime != 0 && (this.lastJumpTime + 600) <= performance.now()) {
+            // когда величина time (текущее время) достигнет this.lastJumpTime + 600)
+
+            this.curentLevel += 1
+            this.catEl.style.transitionDuration = `${this._durationOfJumpDown }ms`
+            this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+
+
+        }
+    }
+}
+
+
+
+
 
 
 cgprt.jumpUp = function () {
+    // не можем прыгнуть выше верхнего уровня
     if (this.curentLevel !== -4) {
+        // уменьшаем уровень на 1
         this.curentLevel -= 1
-
-        this.catEl.classList.add("jumpUp")
+        /* this.catEl.classList.add("jumpUp") */
+        this.catEl.style.transitionDuration = `${this._durationOfJumpUp}ms`
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`;
+        this.lastJumpTime = performance.now()
 
-        setTimeout(this.takeTheLevel, 600);
     }
 }
 
-cgprt.takeTheLevel = function () {
-    if (this.curentLevel !== -2 && this.curentLevel !== 0) {
-        setTimeout(this.jumpDown, 200);
-    }
-}
 
-cgprt.jumpDown = function () {
+/* cgprt.jumpDownChangeCoord = function () {
+
+    // не упасть ниже нижнего уровня
     if (this.curentLevel !== 2) {
         if (this.curentLevel !== -4 && this.curentLevel !== -2 && this.curentLevel !== 0) {
             this.curentLevel += 1
-            this.catEl.classList.add("jumpDown")
-            this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+            this.jumpDown()
         }
+
         else {
-            this.curentLevel += 2
-            this.catEl.classList.add("jumpDown")
-            this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+            this.curentLevel += 1
+            
+            this.jumpDown()
+            setTimeout(this.jumpDown, this.curentLevel += 1, 600);
+
         }
     }
+} */
+
+
+cgprt.jumpDown = function () {
+    // не можем прыгнуть ниже нижнего уровня
+    if (this.curentLevel !== 2) {
+        this.curentLevel += 2
+        /*  this.catEl.classList.add("jumpDown") */
+        this.catEl.style.transitionDuration = `${this._durationOfJumpDown}ms`
+        this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY }px)`
+        /* //убрала 600 ms чтобы спрыгивание происходило сразу
+        this.lastJumpTime = performance.now() - 600 */
+
+    }
+
 }
 
 
-// проверяет столкновение с котом на период прохождения препятствия под котиком
-// приходится играть со временем, чтобы добиться оптимального эффекта
-// нужно ли потом очистить таймер setTimeout?!
-
-
-
-
-// кот носом врезался в препятствие
-/* cgprt.checkCollision = function () {
-
-    if (this.curentLevel != -1) {
-        console.log('бум')
-    }
-} */
 
 
 
