@@ -72,7 +72,7 @@ cgprt.render = function () {
     this.layersEl = new Layers(this.topCoord, this.middleCoord, this.bottomCoord).render()
     this.catGameEl.appendChild(this.layersEl)
 
-    this.navigatorEl = new Navigator(this.jumpUp, this.jumpDown).render()
+    this.navigatorEl = new Navigator(this.jumpUp, this.jumpDownChangeCoord).render()
     this.catGameEl.appendChild(this.navigatorEl)
 
     this.healthLevelEl = new HealthLevel(this.levelCount).render()
@@ -256,6 +256,7 @@ cgprt.jumpUp = function () {
         // уменьшаем уровень на 1
         this.curentLevel -= 1
         /* this.catEl.classList.add("jumpUp") */
+        this.catEl.style.transitionDuration = `${this._durationOfJumpUp}ms`
         this.catEl.style.transitionDuration = `${this._durationOfJumpUp}ms`
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`;
         this.lastJumpTime = performance.now()
