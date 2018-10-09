@@ -1,6 +1,6 @@
-function Navigator(jumpUp, jumpDownChangeCoord) {
+function Navigator(jumpUp, jumpDown) {
     this.jumpUp = jumpUp
-    this.jumpDownChangeCoord = jumpDownChangeCoord
+    this.jumpDown = jumpDown
     
 }
 
@@ -20,7 +20,7 @@ nprt.render = function () {
 
     let arrowDownEl = new Arrow(this.DOWN).render()
     navigatorEl.appendChild(arrowDownEl)
-    arrowDownEl.addEventListener("click", this.jumpDownChangeCoord)
+    arrowDownEl.addEventListener("click", this.jumpDown)
 
     return navigatorEl
 }
