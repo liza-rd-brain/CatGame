@@ -86,10 +86,10 @@
 
 
   
-  @keyframes barrierMove {
+ /*  @keyframes barrierMove {
     from {left: 600px}
     to {left: 0px}
-  }
+  } */
 
 .navigator{
   position: absolute; 
