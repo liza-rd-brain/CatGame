@@ -4,17 +4,15 @@ function CatGame(container) {
     this.layersEl = null
     this.barrierEl = null
     this.healthLevelEl = null
-    //начальный уровень  0 - точка траснформации   
-    this.timerCollision = null
+
     // счетчик экранов, порядковый номер экрана
     this.screenCount = 0
 
     this.curentLevel = 0
     this.lastJumpTime = 0
     this.beginningOfTheGameTime = 0
-    this.attemtCheckCollision = 1
-    this.itIsNewScreen = false
-    this.itIsNewBarrier = false
+
+
     // количество жизней
     this.levelCount = 3
     this.topCoord = "183px"
@@ -31,6 +29,8 @@ function CatGame(container) {
     this.barrierSelectLevel = this.barrierSelectLevel.bind(this)
     this.update = this.update.bind(this)
     this.fallAfterTheJumpUp = this.fallAfterTheJumpUp.bind(this)
+    this.changeCoordUp = this.changeCoordUp.bind(this)
+    this.changeCoordDown = this.changeCoordDown.bind(this)
 
     // объект будет создан с уже вложенным requestAnimationFrame
     // он будет постоянно проверять изменения перед отрисовкой кадра
@@ -44,11 +44,27 @@ function CatGame(container) {
     this.catHight = "50px"
     this.barrierHight = "30px"
 
-    // время начала игры, не будет изменяться
+    // время начала игры, не будет изменяться или же его лучше вынести из конструктора?!
     this.beginningOfTheGameTime = performance.now()
     this.idAnimation = 0
-
+    // состояние игры будет менять от этапа движения барьера и взаимодействия с ним
     this.gameState = "goGame"
+
+
+    this.catCoordYBottom = 235
+    this.catCoordYTop = this.catCoordYBottom + 50
+    /* this.catCoordYTop = 285 */
+
+
+    this.barrierCoordYBottom = 0
+    this.barrierCoordYTop = 0
+
+
+    this.timeForCoordChangeUp = 0
+    this.timeForCoordChangeDown = 0
+    this.catChangingCoordYBottom = 0
+
+
 
 
 }
@@ -61,7 +77,8 @@ cgprt.stepY = 50
 // константы координат
 
 
-cgprt._multiplier = 0.5
+cgprt._multiplier = 1
+
 
 
 //временные константы
@@ -73,11 +90,11 @@ cgprt._timeToRefreshScreen = 0
 
 cgprt._timeOfMovingTheBarrier = 4000 * cgprt._multiplier
 cgprt._timeOfBeginningTheAreaOfCollision = 1800 * cgprt._multiplier
-cgprt._timeOfEndingTheAreaOfCollision = 2200 * cgprt._multiplier
+cgprt._timeOfEndingTheAreaOfCollision = 2300 * cgprt._multiplier
 /* cgprt._intervalOfChekingTheCollision = 100 */
 /* cgprt._durationOfChekingTheCollision = 400 */
 cgprt._durationOfJumpUp = 200 * cgprt._multiplier
-cgprt._durationOfJumpDown = 600 * cgprt._multiplier
+cgprt._durationOfJumpDown = 500 * cgprt._multiplier
 
 
 
@@ -113,6 +130,9 @@ cgprt.update = function () {
     this.smash()
     this.barrierDelete()
 
+    this.changeCoordUp()
+    this.changeCoordDown()
+
 }
 
 
@@ -127,9 +147,7 @@ cgprt.goGame = function () {
             this.createBarrier()
             //выбираем рандомное расположение барьера
             this.barrierSelectLevel()
-            // говорим, что это новый экран чтобы начать движение барьера
-            this.itIsNewScreen = true
-            this.itIsNewBarrier = true
+
             this.screenCount++
             console.log("goGame")
             this.gameState = "barrierMove"
@@ -171,46 +189,27 @@ cgprt.smash = function () {
     // если это перая проверка, проведем ее через 1800 ms
 
 
-    if (/* this.timeOfBeginningMovingTheBarrier != 0  */
-        this.gameState == "smash" &&
+    if (this.gameState == "smash" &&
         (this._timeOfEndingTheAreaOfCollision + this.timeOfBeginningMovingTheBarrier) > performance.now() &&
-
         performance.now() > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningTheAreaOfCollision)
 
-        /* && this.attemtCheckCollision == this.screenCount && this.itIsNewScreen == false */) {
-
+    ) {
         if (this.curentLevel == this.barrierEl.lineOfMotion) {
-            /* console.log('бум') */
             this.deleteHealthPoint()
-
-            this.attemtCheckCollision++
-            //зануляем, чтобы не взять старое
-            /* this.timeOfBeginningMovingTheBarrier = 0 */
             console.log("smash")
-            /* this.gameState = "barrierDelete" */
         }
         this.gameState = "barrierDelete"
     }
-
-
 }
 
-
-
-
-/* cgprt.stopCheckCollison = function () {
-    clearInterval(this.timerCollision)
-} */
-
-//нужно сделать однократное удаление
 cgprt.barrierDelete = function () {
 
     if (performance.now() > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier
-        && this.gameState == "barrierDelete" /* this.itIsNewBarrier == true && this.timeOfBeginningMovingTheBarrier != 0 */) {
+        && this.gameState == "barrierDelete") {
         this.catGameEl.removeChild(this.barrierEl)
         this.itIsNewBarrier = false
         //16.10 занулила время начала движения барьера
-        this.timeOfBeginningMovingTheBarrier = 0
+        /* this.timeOfBeginningMovingTheBarrier = 0 */
         console.log("barrierDelete")
         this.gameState = "goGame"
     }
@@ -224,8 +223,6 @@ cgprt.deleteHealthPoint = function () {
     this.catGameEl.removeChild(this.healthLevelEl)
     this.healthLevelEl = new HealthLevel(this.levelCount).render()
     this.catGameEl.appendChild(this.healthLevelEl)
-
-
 }
 
 cgprt.createBarrier = function () {
@@ -235,7 +232,7 @@ cgprt.createBarrier = function () {
 }
 
 cgprt.barrierSelectLevel = function () {
-    /* let randomAmountBarrier = Math.floor(Math.random() * 4) */
+
     //решаем какой уровень займет барьер
     let randomLevel = Math.floor(Math.random() * 6)
     /*  let randomLevel = 2 */
@@ -245,26 +242,39 @@ cgprt.barrierSelectLevel = function () {
             this.barrierEl.classList.add("barrierLevelTwo")
             //т.к. экран все равно будет перерисовываться будем добавлять классы..
             this.barrierEl.lineOfMotion = 2
+            this.barrierCoordYBottom = 335
+            this.barrierCoordYTop = 385
+
             break
         case 1:
             this.barrierEl.classList.add("barrierLevelOne")
             this.barrierEl.lineOfMotion = 1
+            this.barrierCoordYBottom = 285
+            this.barrierCoordYTop = 335
             break
         case 2:
             this.barrierEl.classList.add("barrierLevelZero")
             this.barrierEl.lineOfMotion = 0
+            this.barrierCoordYBottom = 235
+            this.barrierCoordYTop = 285
             break
         case 3:
             this.barrierEl.classList.add("barrierLevelMinusOne")
             this.barrierEl.lineOfMotion = -1
+            this.barrierCoordYBottom = 185
+            this.barrierCoordYTop = 235
             break
         case 4:
             this.barrierEl.classList.add("barrierLevelMinusTwo")
             this.barrierEl.lineOfMotion = -2
+            this.barrierCoordYBottom = 135
+            this.barrierCoordYTop = 185
             break
         case 5:
             this.barrierEl.classList.add("barrierLevelMinusThree")
             this.barrierEl.lineOfMotion = -3
+            this.barrierCoordYBottom = 85
+            this.barrierCoordYTop = 135
             break
     }
 
@@ -274,6 +284,41 @@ cgprt.barrierSelectLevel = function () {
 
 
 
+// тоже закинем в update
+cgprt.changeCoordUp = function () {
+
+    
+
+    if (this.timeForCoordChangeUp != 0 && (performance.now() - this.timeForCoordChangeUp) <= this._durationOfJumpUp
+        /* && catChangingCoordYBottom <= this.catCoordYBottom - 5 */
+    ) {
+
+        this.catChangingCoordYBottom  += 5
+        console.log(this.catChangingCoordYBottom )
+
+    }
+    else {
+        this.catCoordYBottom = this.catChangingCoordYBottom 
+    }
+
+}
+
+
+cgprt.changeCoordDown = function () {
+
+
+
+    if (this.timeForCoordChangeDown != 0 && (performance.now() - this.timeForCoordChangeDown) <= this._durationOfJumpDown / 2
+        && this.catCoordYBottom >= 240
+    ) {
+
+        this.catCoordYBottom -= 5
+        console.log(this.catCoordYBottom)
+
+    }
+
+}
+
 
 
 //для каждой логики проверки вынести отдельный блок кода = отдельную функцию
@@ -282,12 +327,14 @@ cgprt.fallAfterTheJumpUp = function () {
     if (this.curentLevel !== -2 && this.curentLevel !== 0 && this.curentLevel !== 2) {
         //спрыгивает спустя 600 мс
 
-        if (this.lastJumpTime != 0 && (this.lastJumpTime + 600) <= performance.now()) {
+        if (this.lastJumpTime != 0 && (this.lastJumpTime + this._durationOfJumpDown) <= performance.now()) {
             // когда величина time (текущее время) достигнет this.lastJumpTime + 600)
 
+
             this.curentLevel += 1
-            this.catEl.style.transitionDuration = `${this._durationOfJumpDown}ms`
+            this.catEl.style.transitionDuration = `${this._durationOfJumpDown / 2}ms`
             this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
+            this.timeForCoordChangeDown = performance.now()
         }
     }
 }
@@ -304,6 +351,11 @@ cgprt.jumpUp = function () {
         /* this.catEl.style.transitionDuration = `${this._durationOfJumpUp}ms` */
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`;
         this.lastJumpTime = performance.now()
+
+        this.timeForCoordChangeUp = performance.now()
+        this.catChangingCoordYBottom = this.catCoordYBottom
+        /* this.catCoordYBottom = 235 */
+
 
     }
 }
