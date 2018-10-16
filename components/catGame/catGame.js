@@ -14,6 +14,7 @@ function CatGame(container) {
     this.beginningOfTheGameTime = 0
     this.attemtCheckCollision = 1
     this.itIsNewScreen = false
+    this.itIsNewBarrier = false
     // количество жизней
     this.levelCount = 3
     this.topCoord = "183px"
@@ -24,7 +25,7 @@ function CatGame(container) {
     this.smash = this.smash.bind(this)
     this.deleteHealthPoint = this.deleteHealthPoint.bind(this)
     this.goGame = this.goGame.bind(this)
-    this.stopCheckCollison = this.stopCheckCollison.bind(this)
+    /* this.stopCheckCollison = this.stopCheckCollison.bind(this) */
     this.barrierMove = this.barrierMove.bind(this)
     this.barrierDelete = this.barrierDelete.bind(this)
     this.barrierSelectLevel = this.barrierSelectLevel.bind(this)
@@ -43,8 +44,9 @@ function CatGame(container) {
     this.catHight = "50px"
     this.barrierHight = "30px"
 
-    // время начала игры
+    // время начала игры, не будет изменяться
     this.beginningOfTheGameTime = performance.now()
+    this.idAnimation = 0
 
 
 }
@@ -56,20 +58,24 @@ cgprt.CLASS_NAME = "catGame"
 cgprt.stepY = 50
 // константы координат
 
+
+cgprt._multiplier = 1
+
+
 //временные константы
-cgprt._durationOfOneScreen = 4200
+cgprt._durationOfOneScreen = 4200 * cgprt._multiplier
 
 // не понимаю, зачем нужна эта величина но без нее со второго экрана барьер просто сразу перемещается вконец..
 // или уже не нужна
 cgprt._timeToRefreshScreen = 0
 
-cgprt._timeOfMovingTheBarrier = 4000
-cgprt._timeOfBeginningTheAreaOfCollision = 1800
-cgprt._timeOfEndingTheAreaOfCollision = 2300
+cgprt._timeOfMovingTheBarrier = 4000 * cgprt._multiplier
+cgprt._timeOfBeginningTheAreaOfCollision = 1800 * cgprt._multiplier
+cgprt._timeOfEndingTheAreaOfCollision = 2200 * cgprt._multiplier
 /* cgprt._intervalOfChekingTheCollision = 100 */
 /* cgprt._durationOfChekingTheCollision = 400 */
-cgprt._durationOfJumpUp = 200
-cgprt._durationOfJumpDown = 600
+cgprt._durationOfJumpUp = 200 * cgprt._multiplier
+cgprt._durationOfJumpDown = 600 * cgprt._multiplier
 
 
 
@@ -90,18 +96,20 @@ cgprt.render = function () {
     this.healthLevelEl = new HealthLevel(this.levelCount).render()
     this.catGameEl.appendChild(this.healthLevelEl)
 
-    /*  this.goGame() */
 
 }
 
 
 cgprt.update = function () {
-    requestAnimationFrame(this.update)
-    // привязка к контексту с вызовом
+    //зациклили вызов
+    this.idAnimation = requestAnimationFrame(this.update)
+
     this.fallAfterTheJumpUp()
+
     this.barrierMove()
     this.goGame()
     this.smash()
+    this.barrierDelete()
 
 }
 
@@ -111,31 +119,29 @@ cgprt.goGame = function () {
     // игра начинается= барьер двигается, только если у нас еще есть жизни
     if (this.levelCount > 0) {
 
-
         // если прошло время равное _durationOfOneScreen для данного номера счетчика экрана
-        if (performance.now() > this.beginningOfTheGameTime + this._durationOfOneScreen * this.screenCount) {
+        if (performance.now() > this.beginningOfTheGameTime + this._durationOfOneScreen * this.screenCount
+            && this.itIsNewBarrier == false) {
             this.createBarrier()
             //выбираем рандомное расположение барьера
             this.barrierSelectLevel()
             // говорим, что это новый экран чтобы начать движение барьера
             this.itIsNewScreen = true
+            this.itIsNewBarrier = true
             this.screenCount++
-
+            console.log("goGame")
         }
-
     }
     else {
         // грамотно все очистить/застопить после окончания экрана
         alert("GAME OVER")
+        cancelAnimationFrame(this.idAnimation)
     }
-
 }
 
 
 cgprt.barrierMove = function () {
-
-
-    // если это новый экран, и прошел отрезок времени для обновленния экрана
+    // если это новый экран, и прошел отрезок времени для обновленния экрана(пока не использую временной отрезок)
     if (this.itIsNewScreen) {
 
         // добавляем класс с анимацией
@@ -146,16 +152,10 @@ cgprt.barrierMove = function () {
         this.barrierEl.style.transform = `translateX(${-610}px)`
 
 
-
-        // игра началась, запустили таймер на проверку столкновения через 1.5 секунды
-        // он будет работать примерно одну секунду(может и поменьше)
-        /* setTimeout(this.smash, this._timeOfBeginningTheAreaOfCollision) */
-
-        // по окончании одного экрана удаляем элемент = время движения барьера
-        /* setTimeout(this.barrierDelete, this._timeOfMovingTheBarrier)
- */
-        this.itIsNewScreen = false
         this.timeOfBeginningMovingTheBarrier = performance.now()
+        this.itIsNewScreen = false
+
+        console.log("barrierMove")
     }
 }
 
@@ -165,43 +165,45 @@ cgprt.smash = function () {
     var currentTime = performance.now()
     // здесь зададим промежуток времени проверки на коллизию
     // если это перая проверка, проведем ее через 1800 ms
-    
 
-     if (this.timeOfBeginningMovingTheBarrier != 0 &&currentTime > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningTheAreaOfCollision)/*  this._durationOfOneScreen */
-        && this.attemtCheckCollision == this.screenCount)
 
-        /* && currentTime < this.beginningOfTheGameTime + this.timeOfEndingTheAreaOfCollision * this.screenCount - 1 */ {
-        // зацикливаем таймер проверки на столкновение
-        /*  this.timerCollision = setTimeout(this.smash, this._intervalOfChekingTheCollision) */
+    if (this.timeOfBeginningMovingTheBarrier != 0 &&
+        (this._timeOfEndingTheAreaOfCollision + this.timeOfBeginningMovingTheBarrier)/*  * this.attemtCheckCollision */ > currentTime &&
+
+        currentTime > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningTheAreaOfCollision) /* * this.attemtCheckCollision */
+
+        && this.attemtCheckCollision == this.screenCount && this.itIsNewScreen == false) {
 
         if (this.curentLevel == this.barrierEl.lineOfMotion) {
-            console.log('бум')
+            /* console.log('бум') */
             this.deleteHealthPoint()
-            // если столкновение произошло,  очистим таймер ожидания столкновения сразу
-            /* this.stopCheckCollison() */
+
             this.attemtCheckCollision++
             //зануляем, чтобы не взять старое
-            this.timeOfBeginningMovingTheBarrier = 0
-
+            /* this.timeOfBeginningMovingTheBarrier = 0 */
+            console.log("smash")
         }
-        //если столкновение не произошло, то мы очистим таймер через 600ms
-        /*  else (setTimeout(this.stopCheckCollison, this._durationOfChekingTheCollision)) */
-
-        /* this.attemtCheckCollision++ */
     }
-
 }
 
 
 
 
-cgprt.stopCheckCollison = function () {
+/* cgprt.stopCheckCollison = function () {
     clearInterval(this.timerCollision)
-}
+} */
 
-
+//нужно сделать однократное удаление
 cgprt.barrierDelete = function () {
-    this.catGameEl.removeChild(this.barrierEl)
+    var newCount = performance.now()
+    if (newCount > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier
+        && this.itIsNewBarrier == true && this.timeOfBeginningMovingTheBarrier != 0) {
+        this.catGameEl.removeChild(this.barrierEl)
+        this.itIsNewBarrier = false
+        //16.10 занулила время начала движения барьера
+        this.timeOfBeginningMovingTheBarrier = 0
+        console.log("barrierDelete")
+    }
 
 }
 
@@ -276,8 +278,6 @@ cgprt.fallAfterTheJumpUp = function () {
             this.curentLevel += 1
             this.catEl.style.transitionDuration = `${this._durationOfJumpDown}ms`
             this.catEl.style.transform = `translateY(${this.curentLevel * this.stepY}px)`
-
-
         }
     }
 }
