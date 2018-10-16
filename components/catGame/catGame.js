@@ -48,6 +48,8 @@ function CatGame(container) {
     this.beginningOfTheGameTime = performance.now()
     this.idAnimation = 0
 
+    this.gameState = "goGame"
+
 
 }
 
@@ -59,7 +61,7 @@ cgprt.stepY = 50
 // константы координат
 
 
-cgprt._multiplier = 1
+cgprt._multiplier = 0.5
 
 
 //временные константы
@@ -121,7 +123,7 @@ cgprt.goGame = function () {
 
         // если прошло время равное _durationOfOneScreen для данного номера счетчика экрана
         if (performance.now() > this.beginningOfTheGameTime + this._durationOfOneScreen * this.screenCount
-            && this.itIsNewBarrier == false) {
+            && this.gameState == "goGame") {
             this.createBarrier()
             //выбираем рандомное расположение барьера
             this.barrierSelectLevel()
@@ -130,6 +132,7 @@ cgprt.goGame = function () {
             this.itIsNewBarrier = true
             this.screenCount++
             console.log("goGame")
+            this.gameState = "barrierMove"
         }
     }
     else {
@@ -142,7 +145,7 @@ cgprt.goGame = function () {
 
 cgprt.barrierMove = function () {
     // если это новый экран, и прошел отрезок времени для обновленния экрана(пока не использую временной отрезок)
-    if (this.itIsNewScreen) {
+    if (this.gameState == "barrierMove") {
 
         // добавляем класс с анимацией
         this.barrierEl.classList.add("barrierMove")
@@ -156,23 +159,25 @@ cgprt.barrierMove = function () {
         this.itIsNewScreen = false
 
         console.log("barrierMove")
+        this.gameState = "smash"
     }
 }
 
 
 
 cgprt.smash = function () {
-    var currentTime = performance.now()
+
     // здесь зададим промежуток времени проверки на коллизию
     // если это перая проверка, проведем ее через 1800 ms
 
 
-    if (this.timeOfBeginningMovingTheBarrier != 0 &&
-        (this._timeOfEndingTheAreaOfCollision + this.timeOfBeginningMovingTheBarrier)/*  * this.attemtCheckCollision */ > currentTime &&
+    if (/* this.timeOfBeginningMovingTheBarrier != 0  */
+        this.gameState == "smash" &&
+        (this._timeOfEndingTheAreaOfCollision + this.timeOfBeginningMovingTheBarrier) > performance.now() &&
 
-        currentTime > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningTheAreaOfCollision) /* * this.attemtCheckCollision */
+        performance.now() > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningTheAreaOfCollision)
 
-        && this.attemtCheckCollision == this.screenCount && this.itIsNewScreen == false) {
+        /* && this.attemtCheckCollision == this.screenCount && this.itIsNewScreen == false */) {
 
         if (this.curentLevel == this.barrierEl.lineOfMotion) {
             /* console.log('бум') */
@@ -182,8 +187,12 @@ cgprt.smash = function () {
             //зануляем, чтобы не взять старое
             /* this.timeOfBeginningMovingTheBarrier = 0 */
             console.log("smash")
+            /* this.gameState = "barrierDelete" */
         }
+        this.gameState = "barrierDelete"
     }
+
+
 }
 
 
@@ -195,14 +204,15 @@ cgprt.smash = function () {
 
 //нужно сделать однократное удаление
 cgprt.barrierDelete = function () {
-    var newCount = performance.now()
-    if (newCount > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier
-        && this.itIsNewBarrier == true && this.timeOfBeginningMovingTheBarrier != 0) {
+
+    if (performance.now() > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier
+        && this.gameState == "barrierDelete" /* this.itIsNewBarrier == true && this.timeOfBeginningMovingTheBarrier != 0 */) {
         this.catGameEl.removeChild(this.barrierEl)
         this.itIsNewBarrier = false
         //16.10 занулила время начала движения барьера
         this.timeOfBeginningMovingTheBarrier = 0
         console.log("barrierDelete")
+        this.gameState = "goGame"
     }
 
 }
@@ -227,8 +237,8 @@ cgprt.createBarrier = function () {
 cgprt.barrierSelectLevel = function () {
     /* let randomAmountBarrier = Math.floor(Math.random() * 4) */
     //решаем какой уровень займет барьер
-    /*  let randomLevel = Math.floor(Math.random() * 6) */
-    let randomLevel = 2
+    let randomLevel = Math.floor(Math.random() * 6)
+    /*  let randomLevel = 2 */
 
     switch (randomLevel) {
         case 0:
