@@ -39,7 +39,7 @@
  .barrier{
   position: absolute;
   width:8px;
-  height: 50px;
+  height: 46px;
   /* top:255px; */
  left: 600px;
   /* background: url("components/catGame/barrier/барьер.png")  no-repeat; */
@@ -324,6 +324,15 @@
      /*  border-radius: 50%; */
       /* justify-content: center;
       align-items: center; */
+      
+    }
+
+    .house{
+      position:absolute;
+      top:185px;
+      width:100px;
+      height: 100px;
+      background:#cd4d00;
       
     }
   
