@@ -106,7 +106,7 @@ cgprt.render = function () {
     this.catGameEl.appendChild(this.healthLevelEl)
 
     this.houseOne = this.createHouse(this._classOneHouse)
-    this.houseTwo = this.createHouse(this._classTwoHouse)
+    this.houseTwo = this.createHouse(this._classTwoHouse) 
     this.timeBeginningMovingHome = performance.now()
 
 }
@@ -137,7 +137,7 @@ cgprt.update = function () {
         case "barrierDelete":
             this.barrierDelete()
             break
-    }
+    } 
 
     this.fallAfterTheJumpUp()
     this.checkCatOnHouse()
@@ -146,16 +146,16 @@ cgprt.update = function () {
 }
 
 cgprt.checkCatOnHouse = function () {
-    if (performance.now() > (this.timeBeginningMovingHome + 1900  + (3500 * this.attempcheckCatOnHouse) )
-        && performance.now() < (this.timeBeginningMovingHome + 3500  +  (3500 * this.attempcheckCatOnHouse) )) {
+    const hasA = this.timeBeginningMovingHome + 1900 + (3500 * this.attempcheckCatOnHouse)
+    const someConditionA = performance.now() > hasA
+    const hasB = this.timeBeginningMovingHome + 3500 + (3500 * this.attempcheckCatOnHouse)
+    const someConditionB = performance.now() < hasB
+    const someCondition = someConditionA && someConditionB
+
+    if (someCondition) {
         this.IsCatOnHouse = true
-
-        // попробовать автоматически увеличивать через 1,5
-        /*  this.attempcheckCatOnHouse++
-          */
     }
-
-    else if (performance.now() > (this.timeBeginningMovingHome + 3500 + (3500 * this.attempcheckCatOnHouse))){
+    else if (performance.now() > (this.timeBeginningMovingHome + 3500 + (3500 * this.attempcheckCatOnHouse))) {
         this.IsCatOnHouse = false
         this.attempcheckCatOnHouse++
     }
@@ -163,17 +163,12 @@ cgprt.checkCatOnHouse = function () {
 }
 
 
-
 cgprt.goGame = function () {
-
-    if (this.healthCount > 0) {
+    const hasHealth = this.healthCount > 0;
+    if (hasHealth) {
         this.createBarriers()
-
         console.log("goGame")
         this.gameState = "barrierMove"
-
-
-
     }
     else {
         alert("GAME OVER")
@@ -203,7 +198,7 @@ cgprt.smash = function () {
     ) {
         for (let i = 0; i < this.numberOfBarriers; i++) {
             if (this.curentLevel == this.arrayOfBarriers[i].lineOfMotion) {
-               /*  this.deleteHealthPoint() */
+                this.deleteHealthPoint()
                 console.log("smash")
                 break
             }
