@@ -1,8 +1,15 @@
-/* body {
-  margin: 0;
-  background: white; 
-}
- */
+body {
+ background: white;
+ }
+ .hidingBorder{
+  z-index:2;
+  position: absolute; 
+  width: 600px;
+  height: 620px;
+  left: 600px;
+  top: 0px; 
+  background: white;
+ }
 
 #container{
     /* position:relative; */  
@@ -16,7 +23,8 @@
    overflow: hidden; 
 }
 .cat{
-   position: absolute; 
+  position: absolute; 
+  z-index:1;
   width: 146px;
   height: 50px;
   top: 235px;
@@ -24,27 +32,64 @@
   left: 240px;
   background: url("components/catGame/cat/cat_run.gif") no-repeat;
   background-size: 91px 50px;
- 
-  /*примитивный рисунок котика*/
-  /* background: #DB8A74;
-  border: solid  #478978;
-  border-radius: 80%;
-  border-top-left-radius: 150px;
-  border-top-right-radius: 150px;
-  border-bottom-left-radius: 150px;
-  border-bottom-right-radius: 150px; */
   }
 
 /*сделать релативное,чтобы изображние не вылазило за границу*/
  .barrier{
   position: absolute;
+  z-index:1;
   width:8px;
   height: 46px;
   /* top:255px; */
- left: 600px;
+  left: 610px;
   /* background: url("components/catGame/barrier/барьер.png")  no-repeat; */
    background:brown ; 
+   border: solid rgb(103, 97, 97) 1px;
  }
+
+ .house{
+  position:absolute;
+  z-index:0;
+  top:180px;
+  width:350px;
+  height: 100px;
+  background:#cb81da;
+  border: solid rgb(103, 97, 97) 3px;
+  left: 610px;
+  
+}
+
+
+.barrierMove{
+  transition: transform    linear; 
+}
+
+.houseOneMove{
+  /* transition: transform linear;  */
+  animation: moveHome 7s linear infinite;  
+}
+
+.houseTWoMove{
+  /* transition: transform linear;  */
+  animation: moveHome 7s linear infinite 3500ms;  
+}
+
+
+ @keyframes moveHome {
+  from {
+    left: 650px;
+  
+  }
+  to { 
+    left:-750px; 
+   
+  }  
+} 
+
+
+
+
+
 
 
  .barrierLevelTwo{
@@ -74,12 +119,6 @@
  /* 3 секунды задержка + мы двигаем с 1000px для органичности появления препятствия*/
  /* animation: barrierMove 5s 3s linear infinite; */
  
-
- .barrierMove{
-   transition: transform    linear; 
-
-  
- }
 
 
  
@@ -125,12 +164,18 @@
     position: absolute;
     height:3px;
     width: 600px;
-    background:gray;
+    /* background:gray; */
   }
 
  
 
- 
+  .fence{
+    position: relative;
+    border: solid rgb(103, 97, 97) 3px;
+    bottom: 240px;
+    height: 100px;
+    background-color: rgb(150, 160, 146);
+  } 
 
 
 
@@ -327,12 +372,5 @@
       
     }
 
-    .house{
-      position:absolute;
-      top:185px;
-      width:100px;
-      height: 100px;
-      background:#cd4d00;
-      
-    }
+    
   

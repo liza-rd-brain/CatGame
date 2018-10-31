@@ -2,26 +2,26 @@ function CatGame(container) {
     this.container = container
     this.catEl = null
     this.layersEl = null
-    this.barrierEl = null
     this.healthLevelEl = null
+    this.houseEl = null
 
-    this.screenCount = 0
+    this.IsCatOnHouse = false
+    this.attempcheckCatOnHouse = 0
+
+    this.houseOne = null
+    this.houseTwo = null
+
     this.curentLevel = 0
     this.idAnimation = 0
     this.healthCount = 3
     this.gameState = "goGame"
     this.numberOfBarriers = 0
     this.arrayOfBarriers = 0
-    this.arrayForSelect = 0
 
     this.lastJumpTime = 0
-    /* this.beginningOfTheGameTime = 0 */
     this.timeOfBeginningMovingTheBarrier = 0
     this.beginningOfTheGameTime = performance.now()
-    
-
-
-
+    this.timeBeginningMovingHome = 0
 
     this.jumpUp = this.jumpUp.bind(this)
     this.jumpDown = this.jumpDown.bind(this)
@@ -29,13 +29,17 @@ function CatGame(container) {
     this.deleteHealthPoint = this.deleteHealthPoint.bind(this)
     this.goGame = this.goGame.bind(this)
     this.barrierMove = this.barrierMove.bind(this)
+
     this.barrierDelete = this.barrierDelete.bind(this)
+
     this.barrierSelectLevel = this.barrierSelectLevel.bind(this)
+    this.barrierSelectLineOfMotion = this.barrierSelectLineOfMotion.bind(this)
     this.update = this.update.bind(this)
     this.fallAfterTheJumpUp = this.fallAfterTheJumpUp.bind(this)
-    this.changeCoordUp = this.changeCoordUp.bind(this)
-    this.changeCoordDown = this.changeCoordDown.bind(this)
+
     this.createBarriers = this.createBarriers.bind(this)
+    this.createHouse = this.createHouse.bind(this)
+    this.checkCatOnHouse = this.checkCatOnHouse.bind(this)
 
     requestAnimationFrame(this.update)
 
@@ -55,6 +59,7 @@ function CatGame(container) {
     this.timeForCoordChangeUp = 0
     this.timeForCoordChangeDown = 0
     this.catChangingCoordYBottom = 0
+
 }
 
 let cgprt = CatGame.prototype
@@ -64,11 +69,24 @@ cgprt.stepCatY = 50
 cgprt._multiplier = 1
 
 cgprt._durationOfOneScreen = 4200 * cgprt._multiplier
-cgprt._timeOfMovingTheBarrier = 4000 * cgprt._multiplier
-cgprt._timeOfBeginningCollision = 1800 * cgprt._multiplier
-cgprt._timeOfEndingCollision = 2300 * cgprt._multiplier
+cgprt._timeOfMovingTheBarrier = 3000 * cgprt._multiplier
+cgprt._timeOfBeginningCollision = 1400 * cgprt._multiplier
+cgprt._timeOfEndingCollision = 1800 * cgprt._multiplier
 cgprt._durationOfJumpUp = 200 * cgprt._multiplier
 cgprt._durationOfJumpDown = 500 * cgprt._multiplier
+
+
+cgprt._classOneHouse = "houseOneMove"
+cgprt._classTwoHouse = "houseTwoMove"
+
+/* cgprt._timeOfMovingHome = cgprt._timeOfMovingTheBarrier - 300 */
+
+cgprt._levelTwo = "barrierLevelTwo"
+cgprt._levelOne = "barrierLevelOne"
+cgprt._levelZero = "barrierLevelZero"
+cgprt._levelMinusOne = "barrierLevelMinusOne"
+cgprt._levelMinusTwo = "barrierLevelMinusTwo"
+cgprt._levelMinusThree = "barrierLevelMinusThree"
 
 cgprt.render = function () {
     this.catGameEl = document.createElement("div")
@@ -86,39 +104,76 @@ cgprt.render = function () {
 
     this.healthLevelEl = new HealthLevel(this.healthCount).render()
     this.catGameEl.appendChild(this.healthLevelEl)
+
+    this.houseOne = this.createHouse(this._classOneHouse)
+    this.houseTwo = this.createHouse(this._classTwoHouse)
+    this.timeBeginningMovingHome = performance.now()
+
+}
+cgprt.createHouse = function (classHouse) {
+    this.houseEl = new House().render()
+    this.catGameEl.appendChild(this.houseEl)
+    this.houseEl.classList.add(classHouse)
+    console.log("houseMove")
+
 }
 
 
 cgprt.update = function () {
     this.idAnimation = requestAnimationFrame(this.update)
 
-    //barrierMove должен стоять здесь, сначала задекларировать transition чтобы потом установить transform.translate  
-    //чтобы кадр успел обновиться для анимации барьера,
-
-    this.barrierMove()
-    this.goGame()
-    this.smash()
-    this.barrierDelete()
+    switch (this.gameState) {
+        //barrierMove должен стоять здесь, сначала задекларировать transition чтобы потом установить transform.translate  
+        //чтобы кадр успел обновиться для анимации барьера,
+        case "barrierMove":
+            this.barrierMove()
+            break
+        case "goGame":
+            this.goGame()
+            break
+        case "smash":
+            this.smash()
+            break
+        case "barrierDelete":
+            this.barrierDelete()
+            break
+    }
 
     this.fallAfterTheJumpUp()
+    this.checkCatOnHouse()
 
-    this.changeCoordUp()
-    this.changeCoordDown()
+
 }
 
-cgprt.goGame = function () {
-    if (this.healthCount > 0) {
-        // если прошло время равное _durationOfOneScreen для данного номера счетчика экрана
-        if (this.gameState === "goGame") {
-            this.createBarriers()
-            //делаем домик
-            var houseEl = new House().render()
-            this.catGameEl.appendChild(houseEl)
+cgprt.checkCatOnHouse = function () {
+    if (performance.now() > (this.timeBeginningMovingHome + 1900  + (3500 * this.attempcheckCatOnHouse) )
+        && performance.now() < (this.timeBeginningMovingHome + 3500  +  (3500 * this.attempcheckCatOnHouse) )) {
+        this.IsCatOnHouse = true
 
-            this.screenCount++
-            console.log("goGame")
-            this.gameState = "barrierMove"
-        }
+        // попробовать автоматически увеличивать через 1,5
+        /*  this.attempcheckCatOnHouse++
+          */
+    }
+
+    else if (performance.now() > (this.timeBeginningMovingHome + 3500 + (3500 * this.attempcheckCatOnHouse))){
+        this.IsCatOnHouse = false
+        this.attempcheckCatOnHouse++
+    }
+
+}
+
+
+
+cgprt.goGame = function () {
+
+    if (this.healthCount > 0) {
+        this.createBarriers()
+
+        console.log("goGame")
+        this.gameState = "barrierMove"
+
+
+
     }
     else {
         alert("GAME OVER")
@@ -127,29 +182,28 @@ cgprt.goGame = function () {
 }
 
 cgprt.barrierMove = function () {
-    if (this.gameState == "barrierMove") {
-        for (let i = 0; i < this.numberOfBarriers; i++) {
+    for (let i = 0; i < this.numberOfBarriers; i++) {
+        let barrierMove = this.arrayOfBarriers[i]
+        barrierMove.classList.add("barrierMove")
+        barrierMove.style.transitionDuration = `${this._timeOfMovingTheBarrier}ms`
 
-            this.arrayOfBarriers[i].classList.add("barrierMove")
-            this.arrayOfBarriers[i].style.transitionDuration = `${this._timeOfMovingTheBarrier}ms`
-            // это тоже как-то перенести в КОНСТАНТУ привязка к ширине экрана
-            this.arrayOfBarriers[i].style.transform = `translateX(${-610}px)`
-            this.timeOfBeginningMovingTheBarrier = performance.now()
-            console.log("barrierMove")
-        }
-        this.gameState = "smash"
+        // это тоже как-то перенести в КОНСТАНТУ привязка к ширине экрана
+        barrierMove.style.transform = `translateX(${-600}px)`
+        this.timeOfBeginningMovingTheBarrier = performance.now()
+        console.log("barrierMove")
+
     }
+    this.gameState = "smash"
 }
 
 cgprt.smash = function () {
 
-    if (this.gameState == "smash" &&
-        (this._timeOfEndingCollision + this.timeOfBeginningMovingTheBarrier) > performance.now() &&
+    if ((this._timeOfEndingCollision + this.timeOfBeginningMovingTheBarrier) > performance.now() &&
         performance.now() > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningCollision)
     ) {
         for (let i = 0; i < this.numberOfBarriers; i++) {
             if (this.curentLevel == this.arrayOfBarriers[i].lineOfMotion) {
-                this.deleteHealthPoint()
+               /*  this.deleteHealthPoint() */
                 console.log("smash")
                 break
             }
@@ -159,8 +213,7 @@ cgprt.smash = function () {
 }
 
 cgprt.barrierDelete = function () {
-    if (performance.now() > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier
-        && this.gameState == "barrierDelete") {
+    if (performance.now() > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier) {
         for (let i = 0; i < this.numberOfBarriers; i++) {
             this.catGameEl.removeChild(this.arrayOfBarriers[i])
             console.log("barrierDelete")
@@ -179,93 +232,73 @@ cgprt.deleteHealthPoint = function () {
 
 cgprt.createBarriers = function () {
     this.numberOfBarriers = Math.floor(Math.random() * 4) + 1
-    this.arrayForSelect = [0, 1, 2, 3, 4, 5]
+    var arrayForSelect = [0, 1, 2, 3, 4, 5]
     this.arrayOfBarriers = new Array(this.numberOfBarriers)
 
     for (let i = 0; i < this.numberOfBarriers; i++) {
         this.arrayOfBarriers[i] = new Barrier().render()
         this.catGameEl.appendChild(this.arrayOfBarriers[i])
-        this.barrierEl = this.arrayOfBarriers[i]
-        this.barrierSelectLevel()
-        this.arrayOfBarriers[i].lineOfMotion = this.barrierEl.lineOfMotion
+        var barrierEl = this.arrayOfBarriers[i]
+        // Бить на три метода, выбрали рандомный уровень, соответственную ему линию движения и класс 
+        // или тупо массив перебирать?!
+
+        let lineOfMotion = this.barrierSelectLineOfMotion(arrayForSelect)
+        this.arrayOfBarriers[i].lineOfMotion = lineOfMotion
+        var randomLevel
+        delete arrayForSelect[randomLevel]
+
+        let level = this.barrierSelectLevel(lineOfMotion)
+        barrierEl.classList.add(level)
+
     }
 }
 
-cgprt.barrierSelectLevel = function () {
+cgprt.barrierSelectLineOfMotion = function (arrayForSelect) {
     // мне нужно получить любой имеющийся элемент из массива this.arrayForSelect и избежать повторений
+    /* var randomLevel = 0  */
+
     var randomLevel = false
     while (!randomLevel) {
-        randomLevel = this.arrayForSelect[Math.floor(Math.random() * 6)]
-        delete this.arrayForSelect[randomLevel]
+        randomLevel = arrayForSelect[Math.floor(Math.random() * 6)]
+        delete arrayForSelect[randomLevel]
     }
 
     switch (randomLevel) {
         case 0:
-            this.barrierEl.classList.add("barrierLevelTwo")
-            //т.к. экран все равно будет перерисовываться будем добавлять классы..
-            this.barrierEl.lineOfMotion = 2
-            this.barrierCoordYBottom = 335
-            this.barrierCoordYTop = 385
-            break
+            return lineOfMotion = 2
         case 1:
-            this.barrierEl.classList.add("barrierLevelOne")
-            this.barrierEl.lineOfMotion = 1
-            this.barrierCoordYBottom = 285
-            this.barrierCoordYTop = 335
-            break
+            return lineOfMotion = 1
         case 2:
-            this.barrierEl.classList.add("barrierLevelZero")
-            this.barrierEl.lineOfMotion = 0
-            this.barrierCoordYBottom = 235
-            this.barrierCoordYTop = 285
-            break
+            return lineOfMotion = 0
         case 3:
-            this.barrierEl.classList.add("barrierLevelMinusOne")
-            this.barrierEl.lineOfMotion = -1
-            this.barrierCoordYBottom = 185
-            this.barrierCoordYTop = 235
-            break
+            return lineOfMotion = -1
         case 4:
-            this.barrierEl.classList.add("barrierLevelMinusTwo")
-            this.barrierEl.lineOfMotion = -2
-            this.barrierCoordYBottom = 135
-            this.barrierCoordYTop = 185
-            break
+            return lineOfMotion = -2
         case 5:
-            this.barrierEl.classList.add("barrierLevelMinusThree")
-            this.barrierEl.lineOfMotion = -3
-            this.barrierCoordYBottom = 85
-            this.barrierCoordYTop = 135
-            break
-    }
-
-}
-
-cgprt.changeCoordUp = function () {
-    if (this.timeForCoordChangeUp != 0 && (performance.now() - this.timeForCoordChangeUp) <= this._durationOfJumpUp
-        /* && catChangingCoordYBottom <= this.catCoordYBottom - 5 */
-    ) {
-        this.catChangingCoordYBottom += 5
-        console.log(this.catChangingCoordYBottom)
-    }
-    else {
-        this.catCoordYBottom = this.catChangingCoordYBottom
+            return lineOfMotion = -3
     }
 }
 
-
-cgprt.changeCoordDown = function () {
-    if (this.timeForCoordChangeDown != 0 && (performance.now() - this.timeForCoordChangeDown) <= this._durationOfJumpDown / 2
-        && this.catCoordYBottom >= 240
-    ) {
-        this.catCoordYBottom -= 5
-        console.log(this.catCoordYBottom)
+cgprt.barrierSelectLevel = function () {
+    switch (lineOfMotion) {
+        case 2:
+            return level = this._levelTwo
+        case 1:
+            return level = this._levelOne
+        case 0:
+            return level = this._levelZero
+        case -1:
+            return level = this._levelMinusOne
+        case -2:
+            return level = this._levelMinusTwo
+        case - 3:
+            return level = this._levelMinusThree
     }
 }
 
 cgprt.fallAfterTheJumpUp = function () {
     //если не занял уровень, то спрыгивает
-    if (this.curentLevel !== -2 && this.curentLevel !== 0 && this.curentLevel !== 2) {
+    if (/* this.curentLevel !== -2 */!this.IsCatOnHouse && this.curentLevel !== 0 && this.curentLevel !== 2) {
         //спрыгивает спустя 600 мс
         if (this.lastJumpTime != 0 && (this.lastJumpTime + this._durationOfJumpDown) <= performance.now()) {
             // когда величина time (текущее время) достигнет this.lastJumpTime + 600)
@@ -273,6 +306,8 @@ cgprt.fallAfterTheJumpUp = function () {
             this.catEl.style.transitionDuration = `${this._durationOfJumpDown / 2}ms`
             this.catEl.style.transform = `translateY(${this.curentLevel * this.stepCatY}px)`
             this.timeForCoordChangeDown = performance.now()
+            /* this.IsCatOnHouse = false */
+
         }
     }
 }
