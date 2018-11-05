@@ -5,8 +5,9 @@ function CatGame(container) {
     this.healthLevelEl = null
     this.houseEl = null
 
-    this.IsCatOnHouse = false
-    this.attempcheckCatOnHouse = 0
+    this.isCatInHouse = false
+    this.attempCheckCatOnHouse = 0
+    this.catOnRoofHouse = false
 
     this.houseOne = null
     this.houseTwo = null
@@ -19,9 +20,9 @@ function CatGame(container) {
     this.arrayOfBarriers = 0
 
     this.lastJumpTime = 0
-    this.timeOfBeginningMovingTheBarrier = 0
-    this.beginningOfTheGameTime = performance.now()
-    this.timeBeginningMovingHome = 0
+    this.beginningMovingBarrier = 0
+    this.beginningGameTime = performance.now()
+    this.beginningMovingHome = 0
 
     this.jumpUp = this.jumpUp.bind(this)
     this.jumpDown = this.jumpDown.bind(this)
@@ -33,9 +34,9 @@ function CatGame(container) {
     this.barrierDelete = this.barrierDelete.bind(this)
 
     this.barrierSelectLevel = this.barrierSelectLevel.bind(this)
-    this.barrierSelectLineOfMotion = this.barrierSelectLineOfMotion.bind(this)
+    this.barrierSelectLineMotion = this.barrierSelectLineMotion.bind(this)
     this.update = this.update.bind(this)
-    this.fallAfterTheJumpUp = this.fallAfterTheJumpUp.bind(this)
+    this.fallAfterJumpUp = this.fallAfterJumpUp.bind(this)
 
     this.createBarriers = this.createBarriers.bind(this)
     this.createHouse = this.createHouse.bind(this)
@@ -68,18 +69,18 @@ cgprt.CLASS_NAME = "catGame"
 cgprt.stepCatY = 50
 cgprt._multiplier = 1
 
-cgprt._durationOfOneScreen = 4200 * cgprt._multiplier
-cgprt._timeOfMovingTheBarrier = 3000 * cgprt._multiplier
-cgprt._timeOfBeginningCollision = 1400 * cgprt._multiplier
-cgprt._timeOfEndingCollision = 1800 * cgprt._multiplier
-cgprt._durationOfJumpUp = 200 * cgprt._multiplier
-cgprt._durationOfJumpDown = 500 * cgprt._multiplier
+cgprt._durationOneScreen = 4200 * cgprt._multiplier
+cgprt._timeMovingBarrier = 3000 * cgprt._multiplier
+cgprt._beginningCollision = 1400 * cgprt._multiplier
+cgprt._endingCollision = 1800 * cgprt._multiplier
+cgprt._durationJumpUp = 200 * cgprt._multiplier
+cgprt._durationJumpDown = 500 * cgprt._multiplier
 
 
 cgprt._classOneHouse = "houseOneMove"
 cgprt._classTwoHouse = "houseTwoMove"
 
-/* cgprt._timeOfMovingHome = cgprt._timeOfMovingTheBarrier - 300 */
+/* cgprt._timeOfMovingHome = cgprt._timeMovingBarrier - 300 */
 
 cgprt._levelTwo = "barrierLevelTwo"
 cgprt._levelOne = "barrierLevelOne"
@@ -93,31 +94,31 @@ cgprt.render = function () {
     this.catGameEl.className = this.CLASS_NAME
     this.container.appendChild(this.catGameEl)
 
+    const catGameEl = this.catGameEl
+
     this.catEl = new Cat().render()
-    this.catGameEl.appendChild(this.catEl)
+    catGameEl.appendChild(this.catEl)
 
     this.layersEl = new Layers(this.topCoord, this.middleCoord, this.bottomCoord).render()
-    this.catGameEl.appendChild(this.layersEl)
+    catGameEl.appendChild(this.layersEl)
 
     this.navigatorEl = new Navigator(this.jumpUp, this.jumpDown).render()
-    this.catGameEl.appendChild(this.navigatorEl)
+    catGameEl.appendChild(this.navigatorEl)
 
     this.healthLevelEl = new HealthLevel(this.healthCount).render()
-    this.catGameEl.appendChild(this.healthLevelEl)
+    catGameEl.appendChild(this.healthLevelEl)
 
     this.houseOne = this.createHouse(this._classOneHouse)
-    this.houseTwo = this.createHouse(this._classTwoHouse) 
-    this.timeBeginningMovingHome = performance.now()
-
+    this.houseTwo = this.createHouse(this._classTwoHouse)
+    this.beginningMovingHome = performance.now()
 }
+
 cgprt.createHouse = function (classHouse) {
     this.houseEl = new House().render()
     this.catGameEl.appendChild(this.houseEl)
     this.houseEl.classList.add(classHouse)
     console.log("houseMove")
-
 }
-
 
 cgprt.update = function () {
     this.idAnimation = requestAnimationFrame(this.update)
@@ -137,31 +138,27 @@ cgprt.update = function () {
         case "barrierDelete":
             this.barrierDelete()
             break
-    } 
+    }
 
-    this.fallAfterTheJumpUp()
+    this.fallAfterJumpUp()
     this.checkCatOnHouse()
-
-
 }
 
 cgprt.checkCatOnHouse = function () {
-    const hasA = this.timeBeginningMovingHome + 1900 + (3500 * this.attempcheckCatOnHouse)
-    const someConditionA = performance.now() > hasA
-    const hasB = this.timeBeginningMovingHome + 3500 + (3500 * this.attempcheckCatOnHouse)
-    const someConditionB = performance.now() < hasB
-    const someCondition = someConditionA && someConditionB
+    const beginningCatOnHouse = this.beginningMovingHome + 1900 + (3500 * this.attempCheckCatOnHouse)
+    const alreadyCatOnHouse = performance.now() > beginningCatOnHouse
+    const endingCatOnHouse = this.beginningMovingHome + 3500 + (3500 * this.attempCheckCatOnHouse)
+    const stillCatOnHouse = performance.now() < endingCatOnHouse
+    const timeCatOnHouse = alreadyCatOnHouse && stillCatOnHouse
 
-    if (someCondition) {
-        this.IsCatOnHouse = true
+    if (timeCatOnHouse) {
+        this.isCatInHouse = true
     }
-    else if (performance.now() > (this.timeBeginningMovingHome + 3500 + (3500 * this.attempcheckCatOnHouse))) {
-        this.IsCatOnHouse = false
-        this.attempcheckCatOnHouse++
+    else if (!stillCatOnHouse) {
+        this.isCatInHouse = false
+        this.attempCheckCatOnHouse++
     }
-
 }
-
 
 cgprt.goGame = function () {
     const hasHealth = this.healthCount > 0;
@@ -180,11 +177,11 @@ cgprt.barrierMove = function () {
     for (let i = 0; i < this.numberOfBarriers; i++) {
         let barrierMove = this.arrayOfBarriers[i]
         barrierMove.classList.add("barrierMove")
-        barrierMove.style.transitionDuration = `${this._timeOfMovingTheBarrier}ms`
+        barrierMove.style.transitionDuration = `${this._timeMovingBarrier}ms`
 
         // это тоже как-то перенести в КОНСТАНТУ привязка к ширине экрана
         barrierMove.style.transform = `translateX(${-600}px)`
-        this.timeOfBeginningMovingTheBarrier = performance.now()
+        this.beginningMovingBarrier = performance.now()
         console.log("barrierMove")
 
     }
@@ -193,8 +190,8 @@ cgprt.barrierMove = function () {
 
 cgprt.smash = function () {
 
-    if ((this._timeOfEndingCollision + this.timeOfBeginningMovingTheBarrier) > performance.now() &&
-        performance.now() > (this.timeOfBeginningMovingTheBarrier + this._timeOfBeginningCollision)
+    if ((this._endingCollision + this.beginningMovingBarrier) > performance.now() &&
+        performance.now() > (this.beginningMovingBarrier + this._beginningCollision)
     ) {
         for (let i = 0; i < this.numberOfBarriers; i++) {
             if (this.curentLevel == this.arrayOfBarriers[i].lineOfMotion) {
@@ -208,7 +205,7 @@ cgprt.smash = function () {
 }
 
 cgprt.barrierDelete = function () {
-    if (performance.now() > this.timeOfBeginningMovingTheBarrier + this._timeOfMovingTheBarrier) {
+    if (performance.now() > this.beginningMovingBarrier + this._timeMovingBarrier) {
         for (let i = 0; i < this.numberOfBarriers; i++) {
             this.catGameEl.removeChild(this.arrayOfBarriers[i])
             console.log("barrierDelete")
@@ -234,10 +231,9 @@ cgprt.createBarriers = function () {
         this.arrayOfBarriers[i] = new Barrier().render()
         this.catGameEl.appendChild(this.arrayOfBarriers[i])
         var barrierEl = this.arrayOfBarriers[i]
-        // Бить на три метода, выбрали рандомный уровень, соответственную ему линию движения и класс 
-        // или тупо массив перебирать?!
+        // Бить на три метода, выбрали рандомный уровень, соответственную ему линию движения и класс или массив перебирать?!
 
-        let lineOfMotion = this.barrierSelectLineOfMotion(arrayForSelect)
+        let lineOfMotion = this.barrierSelectLineMotion(arrayForSelect)
         this.arrayOfBarriers[i].lineOfMotion = lineOfMotion
         var randomLevel
         delete arrayForSelect[randomLevel]
@@ -248,10 +244,8 @@ cgprt.createBarriers = function () {
     }
 }
 
-cgprt.barrierSelectLineOfMotion = function (arrayForSelect) {
-    // мне нужно получить любой имеющийся элемент из массива this.arrayForSelect и избежать повторений
+cgprt.barrierSelectLineMotion = function (arrayForSelect) {
     /* var randomLevel = 0  */
-
     var randomLevel = false
     while (!randomLevel) {
         randomLevel = arrayForSelect[Math.floor(Math.random() * 6)]
@@ -291,27 +285,29 @@ cgprt.barrierSelectLevel = function () {
     }
 }
 
-cgprt.fallAfterTheJumpUp = function () {
+cgprt.fallAfterJumpUp = function () {
+    this.catOnRoofHouse = this.isCatInHouse && (this.curentLevel == -2)
     //если не занял уровень, то спрыгивает
-    if (/* this.curentLevel !== -2 */!this.IsCatOnHouse && this.curentLevel !== 0 && this.curentLevel !== 2) {
+    if (!this.catOnRoofHouse && this.curentLevel !== 0 && this.curentLevel !== 2) {
         //спрыгивает спустя 600 мс
-        if (this.lastJumpTime != 0 && (this.lastJumpTime + this._durationOfJumpDown) <= performance.now()) {
+        if (this.lastJumpTime != 0 && (this.lastJumpTime + this._durationJumpDown) <= performance.now()) {
             // когда величина time (текущее время) достигнет this.lastJumpTime + 600)
             this.curentLevel += 1
-            this.catEl.style.transitionDuration = `${this._durationOfJumpDown / 2}ms`
+            this.catEl.style.transitionDuration = `${this._durationJumpDown / 2}ms`
             this.catEl.style.transform = `translateY(${this.curentLevel * this.stepCatY}px)`
             this.timeForCoordChangeDown = performance.now()
-            /* this.IsCatOnHouse = false */
+            /* this.isCatInHouse = false */
 
         }
     }
 }
 
 cgprt.jumpUp = function () {
+    /* const allowedJumpUp */
     // не можем прыгнуть выше верхнего уровня
     if (this.curentLevel !== -4) {
         this.curentLevel -= 1
-        this.catEl.style.transitionDuration = `${this._durationOfJumpUp}ms`
+        this.catEl.style.transitionDuration = `${this._durationJumpUp}ms`
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepCatY}px)`;
         this.lastJumpTime = performance.now()
         this.timeForCoordChangeUp = performance.now()
@@ -320,11 +316,12 @@ cgprt.jumpUp = function () {
 }
 
 cgprt.jumpDown = function () {
+    const allowedJumpDown = this.curentLevel == 0 || this.catOnRoofHouse
     // не можем прыгнуть ниже нижнего уровня
-    if (this.curentLevel !== 2) {
+    if (allowedJumpDown) {
         this.curentLevel += 2
         // мысль сделать переменную изменение уровня котика и закинуть ее в RAF!
-        this.catEl.style.transitionDuration = `${this._durationOfJumpDown}ms`
+        this.catEl.style.transitionDuration = `${this._durationJumpDown}ms`
         this.catEl.style.transform = `translateY(${this.curentLevel * this.stepCatY}px)`
     }
 }
