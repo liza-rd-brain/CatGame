@@ -7,15 +7,7 @@ cprt.render = function () {
    let catEl = document.createElement("div")
     catEl.className = this.CLASS_NAME
     
-
     return catEl
 }
-
-
-
-
-
-
-
 
 cprt = null
